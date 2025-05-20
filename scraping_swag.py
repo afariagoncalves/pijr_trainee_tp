@@ -28,7 +28,7 @@ with SB(browser="chrome") as sb:
         sb.type("#password", "secret_sauce\n")
 
     def coleta_dados():
-        
+
         dados["mochila"] = raspa_produto("#item_4_title_link > div:nth-child(1)",
                                          "div.inventory_item:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
                                          "div.inventory_item:nth-child(1) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1)")
@@ -53,6 +53,22 @@ with SB(browser="chrome") as sb:
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1)")
 
+
+    def adiciona_carrinho():
+        seletor_botao = ["sauce-labs-backpack", "sauce-labs-bike-light", "sauce-labs-bolt-t-shirt", 
+                         "sauce-labs-fleece-jacket", "sauce-labs-onesie", "test\\.allthethings\\(\\)-t-shirt-\\(red\\)"]
+        for i in seletor_botao:
+            sb.click(f"#add-to-cart-{i}")
+            sb.wait_for_element(f"#remove-{i}")
+
+    def entra_carrinho():
+        sb.click(".shopping_cart_link")
+        sb.wait_for_element(".cart_quantity_label")
+        for i in range(6):
+            sb.find_element(f"#item_{i}_title_link > div:nth-child(1)")
+
+
+
     dados = {"mochila": [], 
           "lanterna": [], 
           "camisa preta": [], 
@@ -60,7 +76,12 @@ with SB(browser="chrome") as sb:
           "macacão": [],
           "camisa laranja": []}
     
+
     login()
     sb.wait_for_element('.app_logo')
     time.sleep(1)
+
     coleta_dados()
+
+    adiciona_carrinho()
+    entra_carrinho()
