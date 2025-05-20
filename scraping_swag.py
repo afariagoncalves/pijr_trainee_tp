@@ -1,5 +1,5 @@
 from seleniumbase import SB
-
+import time
 
 
 with SB(browser="chrome") as sb:
@@ -28,7 +28,6 @@ with SB(browser="chrome") as sb:
         sb.type("#password", "secret_sauce\n")
 
     def coleta_dados():
-        sb.wait_for_element('.app_logo')
         
         dados["mochila"] = raspa_produto("#item_4_title_link > div:nth-child(1)",
                                          "div.inventory_item:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
@@ -62,10 +61,6 @@ with SB(browser="chrome") as sb:
           "camisa laranja": []}
     
     login()
+    sb.wait_for_element('.app_logo')
+    time.sleep(1)
     coleta_dados()
-    print(dados["mochila"])
-    print(dados["lanterna"])
-    print(dados["camisa preta"])
-    print(dados["casaco"])
-    print(dados["macacão"])
-    print(dados["camisa laranja"])
