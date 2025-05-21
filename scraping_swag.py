@@ -23,7 +23,7 @@ with SB(browser="chrome") as sb:
         return produto
         
     def login():
-        
+
         sb.open("https://www.saucedemo.com")    
         sb.type("#user-name", "standard_user")  
         sb.type("#password", "secret_sauce\n")
@@ -116,5 +116,10 @@ with SB(browser="chrome") as sb:
     
     raspar_compra()
 
-    print(informacoes_compra)
-    
+    sb.click("#finish")
+    elemento = sb.find_element(".complete-header")
+    if (elemento.text != "Thank you for your order!"):
+        print("Erro ao realizar compra")
+    else:   
+        print("Compra realizada com sucesso!")
+
