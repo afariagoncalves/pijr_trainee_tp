@@ -23,6 +23,7 @@ with SB(browser="chrome") as sb:
         return produto
         
     def login():
+        
         sb.open("https://www.saucedemo.com")    
         sb.type("#user-name", "standard_user")  
         sb.type("#password", "secret_sauce\n")
@@ -55,18 +56,29 @@ with SB(browser="chrome") as sb:
 
 
     def adiciona_carrinho():
+
         seletor_botao = ["sauce-labs-backpack", "sauce-labs-bike-light", "sauce-labs-bolt-t-shirt", 
                          "sauce-labs-fleece-jacket", "sauce-labs-onesie", "test\\.allthethings\\(\\)-t-shirt-\\(red\\)"]
         for i in seletor_botao:
             sb.click(f"#add-to-cart-{i}")
             sb.wait_for_element(f"#remove-{i}")
+ 
+    def checkout():
 
-    def entra_carrinho():
-        sb.click(".shopping_cart_link")
-        sb.wait_for_element(".cart_quantity_label")
-        for i in range(6):
-            sb.find_element(f"#item_{i}_title_link > div:nth-child(1)")
+        sb.type("#first-name", "Trainee")
+        sb.type("#last-name", "PiJunior")
+        sb.type("#postal-code", "31270-901")
 
+    def raspar_compra():
+
+        pagamento_elemento = sb.find_element("div.summary_value_label:nth-child(2)")
+        informacoes_compra["meio de pagamento"] = pagamento_elemento.text
+
+        entrega_elemento = sb.find_element("div.summary_value_label:nth-child(4)")
+        informacoes_compra["forma de entrega"] = entrega_elemento.text
+
+        total_elemento = sb.find_element(".summary_total_label")
+        informacoes_compra["total"] = total_elemento.text
 
 
     dados = {"mochila": [], 
@@ -76,7 +88,6 @@ with SB(browser="chrome") as sb:
           "macacão": [],
           "camisa laranja": []}
     
-
     login()
     sb.wait_for_element('.app_logo')
     time.sleep(1)
@@ -84,4 +95,26 @@ with SB(browser="chrome") as sb:
     coleta_dados()
 
     adiciona_carrinho()
-    entra_carrinho()
+
+    sb.click(".shopping_cart_link")
+    sb.wait_for_element(".cart_quantity_label")
+    for i in range(6):
+        sb.find_element(f"#item_{i}_title_link > div:nth-child(1)")    
+        
+
+    sb.click("#checkout")
+    sb.wait_for_element(".checkout_info")
+
+    checkout()
+
+    sb.click("#continue")
+    sb.wait_for_element(".cart_quantity_label")
+
+    informacoes_compra = {"meio de pagamento" : "",
+                          "forma de entrega": "",
+                          "total": ""}
+    
+    raspar_compra()
+
+    print(informacoes_compra)
+    
