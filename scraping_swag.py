@@ -1,5 +1,4 @@
 from seleniumbase import SB
-import time
 import csv
 
 
@@ -11,7 +10,12 @@ with SB(browser="chrome") as sb:
         "casaco": [], 
         "macacão": [],
         "camisa laranja": []}
+    
+    informacoes_compra = {"Meio de pagamento" : "",
+                        "Forma de entrega": "",
+                        "Total": ""}
 
+    # acha e retorna o nome, descricao e preço de um produto
     def raspa_produto(seletor_nome, seletor_descricao, seletor_preco):
 
         produto = []
@@ -30,15 +34,14 @@ with SB(browser="chrome") as sb:
 
         return produto
 
-
     def login():
 
         sb.open("https://www.saucedemo.com")    
         sb.type("#user-name", "standard_user")  
         sb.type("#password", "secret_sauce\n")
 
-
-    def coleta_dados():
+    # armazena os dados retornados por raspa_pruduto no dicionário dados
+    def coleta_dados(dados):
 
         dados["mochila"] = raspa_produto("#item_4_title_link > div:nth-child(1)",
                                          "div.inventory_item:nth-child(1) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
@@ -64,7 +67,7 @@ with SB(browser="chrome") as sb:
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1)")
         
-
+    # salva as informações armazenadas em dados no arquivo produtos.csv 
     def salvar_csv(dados):
 
         with open('produtos.csv', 'w+') as arquivo:
@@ -77,7 +80,7 @@ with SB(browser="chrome") as sb:
 
         print("Dados dos produtos salvos em produtos.csv")
 
-
+    # adiciona todos os produtos do site ao carrinho
     def adiciona_carrinho():
 
         seletor_botao = ["sauce-labs-backpack", "sauce-labs-bike-light", "sauce-labs-bolt-t-shirt", 
@@ -86,14 +89,13 @@ with SB(browser="chrome") as sb:
             sb.click(f"#add-to-cart-{i}")
             sb.wait_for_element(f"#remove-{i}")
  
-
     def checkout():
 
         sb.type("#first-name", "Trainee")
         sb.type("#last-name", "PiJunior")
         sb.type("#postal-code", "31270-901")
 
-
+    # acha e armazena os dados da compra no dicionário informacoes_compra
     def raspar_compra():
 
         pagamento_elemento = sb.find_element("div.summary_value_label:nth-child(2)")
@@ -108,36 +110,35 @@ with SB(browser="chrome") as sb:
     
     login()
     sb.wait_for_element('.app_logo')
-    time.sleep(1)
 
-    coleta_dados()
-
+    coleta_dados(dados)
     salvar_csv(dados);
 
     adiciona_carrinho()
 
+    # abre a pagina do carrinho e verifica se todos os produtos estão presentes
     sb.click(".shopping_cart_link")
     sb.wait_for_element(".cart_quantity_label")
     for i in range(6):
         sb.find_element(f"#item_{i}_title_link > div:nth-child(1)")    
-        
 
+    # abre a pagina de checkout        
     sb.click("#checkout")
     sb.wait_for_element(".checkout_info")
 
     checkout()
 
+    # abre a pagina de revisão da compra
     sb.click("#continue")
     sb.wait_for_element(".cart_quantity_label")
-
-    informacoes_compra = {"Meio de pagamento" : "",
-                          "Forma de entrega": "",
-                          "Total": ""}
     
     raspar_compra()
 
+    # finaliza a compra
     sb.click("#finish")
     elemento = sb.find_element(".complete-header")
+
+    # verifica se a compra foi concluída, se sim imprime dados da compra
     if (elemento.text != "Thank you for your order!"):
         print("Erro ao realizar compra")
     else:   
