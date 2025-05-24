@@ -1,8 +1,16 @@
 from seleniumbase import SB
 import time
+import csv
 
 
 with SB(browser="chrome") as sb:
+
+    dados = {"mochila": [], 
+        "lanterna": [], 
+        "camisa preta": [], 
+        "casaco": [], 
+        "macacão": [],
+        "camisa laranja": []}
 
     def raspa_produto(seletor_nome, seletor_descricao, seletor_preco):
 
@@ -21,12 +29,14 @@ with SB(browser="chrome") as sb:
         produto.append(preco)
 
         return produto
-        
+
+
     def login():
 
         sb.open("https://www.saucedemo.com")    
         sb.type("#user-name", "standard_user")  
         sb.type("#password", "secret_sauce\n")
+
 
     def coleta_dados():
 
@@ -53,6 +63,19 @@ with SB(browser="chrome") as sb:
         dados["camisa laranja"] = raspa_produto("#item_3_title_link > div:nth-child(1)",
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(1) > div:nth-child(2)",
                                                 "div.inventory_item:nth-child(6) > div:nth-child(2) > div:nth-child(2) > div:nth-child(1)")
+        
+
+    def salvar_csv(dados):
+
+        with open('produtos.csv', 'w+') as arquivo:
+            writer = csv.writer(arquivo)
+            # Escrever cabeçalho
+            writer.writerow(['Nome', 'Descrição', 'Preço'])
+            # Escrever dados
+            for i in dados:
+                writer.writerow([dados[i][0], dados[i][1], dados[i][2]])
+
+        print("Dados salvos em produtos.csv")
 
 
     def adiciona_carrinho():
@@ -63,11 +86,13 @@ with SB(browser="chrome") as sb:
             sb.click(f"#add-to-cart-{i}")
             sb.wait_for_element(f"#remove-{i}")
  
+
     def checkout():
 
         sb.type("#first-name", "Trainee")
         sb.type("#last-name", "PiJunior")
         sb.type("#postal-code", "31270-901")
+
 
     def raspar_compra():
 
@@ -80,19 +105,14 @@ with SB(browser="chrome") as sb:
         total_elemento = sb.find_element(".summary_total_label")
         informacoes_compra["total"] = total_elemento.text
 
-
-    dados = {"mochila": [], 
-          "lanterna": [], 
-          "camisa preta": [], 
-          "casaco": [], 
-          "macacão": [],
-          "camisa laranja": []}
     
     login()
     sb.wait_for_element('.app_logo')
     time.sleep(1)
 
     coleta_dados()
+
+    salvar_csv(dados);
 
     adiciona_carrinho()
 
