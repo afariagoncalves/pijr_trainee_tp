@@ -75,7 +75,7 @@ with SB(browser="chrome") as sb:
             for i in dados:
                 writer.writerow([dados[i][0], dados[i][1], dados[i][2]])
 
-        print("Dados salvos em produtos.csv")
+        print("Dados dos produtos salvos em produtos.csv")
 
 
     def adiciona_carrinho():
@@ -97,13 +97,13 @@ with SB(browser="chrome") as sb:
     def raspar_compra():
 
         pagamento_elemento = sb.find_element("div.summary_value_label:nth-child(2)")
-        informacoes_compra["meio de pagamento"] = pagamento_elemento.text
+        informacoes_compra["Meio de pagamento"] = pagamento_elemento.text
 
         entrega_elemento = sb.find_element("div.summary_value_label:nth-child(4)")
-        informacoes_compra["forma de entrega"] = entrega_elemento.text
+        informacoes_compra["Forma de entrega"] = entrega_elemento.text
 
         total_elemento = sb.find_element(".summary_total_label")
-        informacoes_compra["total"] = total_elemento.text
+        informacoes_compra["Total"] = total_elemento.text[7:]
 
     
     login()
@@ -130,9 +130,9 @@ with SB(browser="chrome") as sb:
     sb.click("#continue")
     sb.wait_for_element(".cart_quantity_label")
 
-    informacoes_compra = {"meio de pagamento" : "",
-                          "forma de entrega": "",
-                          "total": ""}
+    informacoes_compra = {"Meio de pagamento" : "",
+                          "Forma de entrega": "",
+                          "Total": ""}
     
     raspar_compra()
 
@@ -142,4 +142,7 @@ with SB(browser="chrome") as sb:
         print("Erro ao realizar compra")
     else:   
         print("Compra realizada com sucesso!")
+        print("Dados da compra:")
+        for i in informacoes_compra:
+            print(f"\t{i}: {informacoes_compra[i]}")
 
